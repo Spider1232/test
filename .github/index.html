@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mijn Kunstwerken Gallery</title>
+  <link rel="icon" href="images/favicon.png">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      color: #e0e0e0;
+      line-height: 1.6;
+      background-image: url('images/background.jpg');
+      background-size: 2000px 800px;
+      background-position: center;
+      background-attachment: fixed;
+      background-color: rgba(174, 196, 214, 0.75);
+      background-blend-mode: multiply;
+    }
+
+    /* === NAVIGATIE === */
+    .top-nav {
+      background: rgba(20,20,35,0.55);
+      backdrop-filter: blur(14px);
+      padding: 1rem 5vw;
+      position: sticky;
+      top: 0;
+      z-index: 2000;
+      border-bottom: 1px solid rgba(212,175,55,0.35);
+    }
+
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+    }
+
+    .logo {
+      color: #d4af37;
+      font-size: 1.8rem;
+      font-weight: 700;
+      text-decoration: none;
+      text-shadow: 0 0 12px rgba(212,175,55,0.4);
+    }
+
+    /* DESKTOP MENU */
+    .nav-links a {
+      color: #e0e0e0;
+      margin: 0 1.2rem;
+      text-decoration: none;
+      font-size: 1.15rem;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active { color: #d4af37; }
+
+    .social-icons a {
+      color: #e0e0e0;
+      font-size: 1.5rem;
+      margin-left: 1rem;
+    }
+
+    /* === MOBIEL MENU === */
+    #menu-toggle { display: none; }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .hamburger span {
+      width: 28px;
+      height: 3px;
+      background: #d4af37;
+      border-radius: 3px;
+    }
+
+    /* VERBERG MOBIEL MENU OP DESKTOP */
+    .mobile-menu {
+      display: none !important;
+    }
+
+    @media (max-width: 800px) {
+      .hamburger { display: flex; }
+
+      .nav-links, .social-icons { display: none; }
+
+      #menu-toggle:checked ~ .mobile-menu { display: flex !important; }
+
+      .mobile-menu {
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: rgba(26,26,46,0.97);
+        padding: 1.8rem 2rem;
+        border-bottom: 1px solid rgba(212,175,55,0.35);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+        z-index: 1500;
+      }
+
+      .mobile-menu a {
+        color: #e0e0e0;
+        font-size: 1.35rem;
+        padding: 0.8rem 0;
+        text-decoration: none;
+      }
+
+      .mobile-menu a:hover { color: #d4af37; }
+
+      .mobile-social {
+        margin-top: 1.2rem;
+        display: flex;
+        gap: 1.4rem;
+      }
+
+      .mobile-social a {
+        font-size: 1.8rem;
+        color: #e0e0e0;
+      }
+
+      .mobile-social a:hover { color: #d4af37; }
+    }
+
+    /* === HEADER === */
+    header {
+      text-align: center;
+      padding: 6rem 1rem 4rem;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.4), transparent);
+    }
+
+    h1 {
+      font-size: clamp(3rem, 8vw, 5.5rem);
+      color: #d4af37;
+      text-shadow: 0 3px 12px rgba(0,0,0,0.8);
+    }
+
+    /* === GALLERY === */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2.2rem;
+      padding: 2rem 5vw 4rem;
+      max-width: 1800px;
+      margin: 0 auto;
+    }
+
+    figure {
+      position: relative;
+      overflow: hidden;
+      border-radius: 14px;
+      background: #111;
+      box-shadow: 0 10px 35px rgba(0,0,0,0.7);
+      transition: 0.4s;
+    }
+
+    figure:hover { transform: translateY(-14px); }
+
+    img {
+      width: 100%;
+      aspect-ratio: 4/5;
+      object-fit: cover;
+      transition: 0.5s;
+    }
+
+    figure:hover img { transform: scale(1.09); }
+
+    figcaption {
+      padding: 1.3rem 1.5rem;
+      font-size: 0.98rem;
+      color: #ccc;
+      background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+
+    /* === LIGHTBOX === */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.96);
+      z-index: 3000;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .lightbox:target { display: flex; }
+
+    .lightbox img {
+      max-width: 100vw;
+      max-height: 100vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 0 70px rgba(212,175,55,0.35);
+    }
+
+    .close {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      font-size: 3rem;
+      color: white;
+      cursor: pointer;
+    }
+
+    footer {
+      text-align: center;
+      padding: 4rem 1rem 2rem;
+      opacity: 0.75;
+      background: rgba(10,10,14,0.8);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAVIGATIE -->
+  <nav class="top-nav">
+    <div class="nav-container">
+
+      <a href="index.html" class="logo">Kunst van Thibault P</a>
+
+      <input type="checkbox" id="menu-toggle">
+      <label for="menu-toggle" class="hamburger">
+        <span></span><span></span><span></span>
+      </label>
+
+      <!-- DESKTOP MENU -->
+      <div class="nav-links">
+        <a href="index.html" class="active">Gallery</a>
+        <a href="about.html">Over mij</a>
+      </div>
+
+      <div class="social-icons">
+        <a href="https://www.instagram.com/polet_creations_/" target="_blank"><i class="fab fa-instagram"></i></a>
+        <a href="https://www.tiktok.com/@polet_thibault" target="_blank"><i class="fab fa-tiktok"></i></a>
+        <a href="https://www.facebook.com/polet.creations/" target="_blank"><i class="fab fa-facebook"></i></a>
+      </div>
+
+      <!-- MOBIEL MENU -->
+      <div class="mobile-menu">
+        <a href="index.html">Gallery</a>
+        <a href="about.html">Over mij</a>
+
+        <div class="mobile-social">
+          <a href="https://www.instagram.com/polet_creations_/" target="_blank"><i class="fab fa-instagram"></i></a>
+          <a href="https://www.tiktok.com/@polet_thibault" target="_blank"><i class="fab fa-tiktok"></i></a>
+          <a href="https://www.facebook.com/polet.creations/" target="_blank"><i class="fab fa-facebook"></i></a>
+        </div>
+      </div>
+
+    </div>
+  </nav>
+
+  <header>
+    <h1>Mijn Kunstwerken</h1>
+    <p>Klik op een werk voor een grotere weergave</p>
+
+
+
+  </header>
+  
+  <main class="gallery">
+
+    <figure>
+      <a href="#img0"><img src="images/Zonondergang.jpg" alt="Zonsondergang in Stormkleuren"></a>
+      <figcaption>Zonsondergang in Stormkleuren - 2026 </figcaption>
+    </figure>
+   
+    <figure>
+      <a href="#img6"><img src="images/Kyra (202501102).jpg" alt="Kyra"></a>
+      <figcaption>Kyra - Pekinees - 2025</figcaption>
+    </figure>
+
+    <figure>
+      <a href="#img7"><img src="images/Kasteel Vianden (20250312).jpg" alt="Kasteel Vianden"></a>
+      <figcaption>Kasteel Vianden - Luxemburg - 2025</figcaption>
+    </figure>
+ 
+    <figure>
+      <a href="#img5"><img src="images/Lady (20250214).jpg" alt="Lady"></a>
+      <figcaption>Lady - Cavia - 2025</figcaption>
+    </figure>
+
+    <figure>
+      <a href="#img8"><img src="images/Zicht aan zee (20240312).jpg" alt="Zicht aan zee"></a>
+      <figcaption>Zicht aan zee - Belgische kust - 2024</figcaption>
+    </figure>
+
+    <figure>
+      <a href="#img9"><img src="images/Mimie (20230318).jpg" alt="Mimie"></a>
+      <figcaption>Mimie - Cavia - 2023</figcaption>
+    </figure>
+   
+    <figure>
+      <a href="#img10"><img src="images/Daisy-Bella (20230129).jpg" alt="Daisy-Bella"></a>
+      <figcaption>Daisy-Bella - Cavia's- 2023</figcaption>
+    </figure>
+
+    <figure>
+      <a href="#img1"><img src="images/Jelly (20221030121321).jpg" alt="Jelly Cocker spaniel"></a>
+      <figcaption>Jelly Cocker spaniel - 2022</figcaption>
+    </figure>
+
+    <figure>
+      <a href="#img3"><img src="images/Princesse (20221013080117).jpg" alt="Princesse"></a>
+      <figcaption>Princesse - Cavia - 2022</figcaption>
+    </figure>
+
+
+
+    <figure>
+      <a href="#img2"><img src="images/Théodore (20221020050509).png" alt="Théodore"></a>
+      <figcaption>Théodore - Cavia - 2022</figcaption>
+    </figure>
+
+    <figure>
+      <a href="#img4"><img src="images/Project (20221027055049).jpg" alt="Zonsondergang met zeilboot"></a>
+      <figcaption>Zonsondergang met een mooie zeilboot - 2022</figcaption>
+    </figure>
+
+     
+
+
+  </main>
+
+  <!-- LIGHTBOXES  -->
+  <div class="lightbox" id="img1"><a href="#" class="close">×</a><img src="images/jelly (20221030121321).jpg" alt="Jelly Cocker spaniel"></div>
+  <div class="lightbox" id="img2"><a href="#" class="close">×</a><img src="images/Théodore (20221020050509).png" alt="Théodore"></div>
+  <div class="lightbox" id="img3"><a href="#" class="close">×</a><img src="images/Princesse (20221013080117).jpg" alt="Princesse"></div>
+  <div class="lightbox" id="img4"><a href="#" class="close">×</a><img src="images/Project (20221027055049).jpg" alt="Zonsondergang met zeilboot"></div>
+  <div class="lightbox" id="img0"><a href="#" class="close">×</a><img src="images/Zonondergang.jpg" alt="Zonsondergang in Stormkleuren"></div>
+  <div class="lightbox" id="img5"><a href="#" class="close">×</a><img src="images/Lady (20250214).jpg" alt="Lady"></div>
+  <div class="lightbox" id="img6"><a href="#" class="close">×</a><img src="images/Kyra (202501102).jpg" alt="Kyra"></div>
+  <div class="lightbox" id="img7"><a href="#" class="close">×</a><img src="images/Kasteel Vianden (20250312).jpg" alt="Kasteel Vianden"></div>
+  <div class="lightbox" id="img8"><a href="#" class="close">×</a><img src="images/Zicht aan zee (20240312).jpg" alt="Zicht aan zee"></div>
+  <div class="lightbox" id="img9"><a href="#" class="close">×</a><img src="images/Mimie (20230318).jpg" alt="Mimie"></div>
+  <div class="lightbox" id="img10"><a href="#" class="close">×</a><img src="images/Daisy-Bella (20230129).jpg" alt="Daisy-Bella"></div>
+
+  <footer>
+    <p>© 2026 — Thibault P (Polet Creations Creativiteit in elke lijn en vorm)
+  </footer>
+</body>
+</html>
